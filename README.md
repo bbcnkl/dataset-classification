@@ -18,4 +18,8 @@ npm install
 ```python
 node index.js
 ```
+## Startovanje aplikacije
+
+U web pregledaču otvoriti link:
+http://localhost:8080
 
