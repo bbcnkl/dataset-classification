@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>553</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+    <style>
+    #all {
+        margin-top: 500px;
+    }
+    #all > div {
+        float: left;
+    }
+    </style>
+</head>
+<body>
+    <div id="info"></div>
+    <br />
+    <div>
+        <a href="/">Nazad</a>
+    </div>
+    <h3 style="text-align: center;">Grafički prikaz podataka</h3>
+    <br />
+    <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+        <canvas id="myChart"></canvas>
+    </div>
+    <div id="all">
+
+    </div>
+</body>
+<script>
+var data =  ${data};
+var targetParam = "${target}"
+var algorithm = "${algorithm}";
+var correct = "${correct}";
+var numberForTest = "${numberForTest}";
+
+var names = {
+    "rf": "Random Forest Classifier",
+    "svm": "Support Vector Machine",
+    "knn": "K-Nearest Neighbors"
+}
+
+numberForTest = Number(numberForTest);
+correct = Number(correct);
+
+$("#info").append("<p>Broj instanci: <strong>" + data.length + "</strong></p>");
+$("#info").append("<p>Broj trening instanci: <strong>" + (data.length - numberForTest) + "</strong></p>");
+$("#info").append("<p>Broj test instanci: <strong>" + numberForTest + " </strong></p>");
+$("#info").append("<p>Procenat tačnosti za algoritam <u>" + names[algorithm] + "</u> iznosi: <strong>" + parseFloat((correct/numberForTest)*100).toFixed(2) + "%" + "</strong></p>");
+
+
+function groupBy(list, keyGetter) {
+    const map = new Map();
+    list.forEach((item) => {
+         const key = keyGetter(item);
+         const collection = map.get(key);
+         if (!collection) {
+             map.set(key, [item]);
+         } else {
+             collection.push(item);
+         }
+    });
+    return map;
+}
+
+const grouped = groupBy(data, el => el[targetParam]);
+var keys = [];
+
+var bigGroup = {};
+var allOtherKeys = [];
+for(k in data[0])
+    allOtherKeys.push(k)
+allOtherKeys = allOtherKeys.filter(e => e !== targetParam)
+
+grouped.forEach((item, key) => {
+    keys.push(key);
+    bigGroup[key] = {};
+})
+var dataLength = [];
+
+
+
+for(var i = 0; i < keys.length; i++) {
+    dataLength.push(grouped.get(keys[i]).length);
+    for(var j = 0; j < allOtherKeys.length; j++) {
+        bigGroup[keys[i]][allOtherKeys[j]] = groupBy(grouped.get(keys[i]), el => el[allOtherKeys[j]]);
+    }
+    
+}
+
+</script>
+<script src="./templates/assets/js/models.js"></script>
+</html>

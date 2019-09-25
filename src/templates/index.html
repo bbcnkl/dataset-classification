@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>553</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="./templates/assets/css/style.css">
+  <style>
+  hr {
+    display: none;
+  }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="./templates/assets/js/index.js"></script>
+</head>
+<body>
+
+  <div class="form active">
+
+    <form action="/models" method="post" enctype="multipart/form-data" id="csvFile" onchange='onChooseFile(event, onFileLoad.bind(this, "contents"))'>
+      <div class="algorithm-wrap">
+        <div class="col-md-6">
+          <h2 class="text-left">Odaberite algoritam</h2>
+          <div class="algorithm-list">
+            <h2 class="text-left"><input type="radio" class="form-check-input" name="algorithm" value="svm" id="svmID" /> 
+              <label class="form-check-label" for="svmID">Support Vector Machine</label>
+            </h2>
+            <h2 class="text-left"><input type="radio" class="form-check-input" name="algorithm" value="knn" id="knnID" /> 
+              <label class="form-check-label" for="knnID">K-Nearest Neighboor Classifier</label>
+            </h2>
+            <h2 class="text-left"><input type="radio" class="form-check-input" name="algorithm" value="rf" id="rfID" /> 
+              <label class="form-check-label" for="rfID">Random Forest Classifier</label>
+            </h2>
+          </div>
+         
+        </div>
+      </div>
+   
+      <br />
+      <div class="clearfix"></div>
+      <hr>
+      <div class="row">
+        <div class="col-lg-4" id="file-choose" style="display: none;">
+          <p>Odaberite CSV datoteku: </p>
+          <input type="file" name="filetoupload">
+        </div>
+        <div class="col-lg-2" id="number-of-parameters-wrap" style="display: none;">
+          <p>Broj parametara: </p>
+          <p><strong id="number-of-parameters"></strong></p>
+          <p>Broj instanci: </p>
+          <p><strong id="number-of-rows"></strong></p>
+        </div>
+        <div class="col-lg-6">
+          <div id="svm-options" style="display: none;">
+            <p>Podešavanja za algoritam: </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p>Kernel: </p>
+                    <select name="svm-kernel">
+                      <option value="linear">Linear kernel</option>
+                      <option value="rbf" selected>Gaussian (radial basis function) kernel</option>
+                      <option value="polynomial">Polynomial kernel</option>
+                      <option value="exponential">Exponential kernel</option>
+                      <option value="laplacian">Laplacian kernel</option>
+                      <option value="anova">ANOVA kernel</option>
+                      <option value="rational">Rational Quadratic kernel</option>
+                      <option value="multiquadratic">Multiquadratic kernel</option>
+                      <option value="cauchy">Cauchy kernel</option>
+                      <option value="histogram">Histogram Intersection kernel</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <p>Parametar regularizacije:</p>
+                    <input type="number" value="1" name="svm-reg" />
+                </div>
+            </div>
+          </div>
+          <div id="num-of-trees" style="display: none;">
+            <p>Podešavanja za algoritam: </p>
+            <p>Broj drveća u šumi:</p>
+            <input type="number" value="10" name="trees" />
+          </div>
+        </div>
+      </div>
+      
+      
+      <hr>
+      <div class="row">
+        <div class="col-lg-3">
+          <div id="target"  style="display: none;">
+            <p>Ciljni atribut: </p>
+            <input type="text" name="target" value="class" />
+          </div>
+        </div>
+  
+        <div class="col-lg-4">
+          <div id="training-percent" class="row" style="display: none;">
+            <div class="col-md-6">
+                <p>% podataka za trening:</p>
+                <input type="number" value="97" max="100" min="1" id="training-number" name="training" style="width: 100%" />
+            </div>
+            <div class="col-md-6">
+                <p>% podataka za test:</p>
+                <input type="number" value="3" id="test-number"  style="width: 100%" disabled />
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+            <div id="check-header" style="display: none;">
+              <br/>
+              <label>Da li CSV datoteka ima zaglavlje?</label>
+              <input type="radio" name="header" value="1" /> <label>Da</label>
+              <input type="radio" name="header" value="0" /> <label>Ne</label>
+      
+            
+            </div>
+        </div>
+        
+        
+      </div>
+      <hr>
+
+      <div id="attr-inputs" style="display: none;">
+      </div>
+      <hr>
+      <input type="submit" id="submit" class="submit" value="Započni trening" style="display: none;">
+    </form>
+
+
+  </div>
+  
+  <div class="ok_message">
+    <span>Treniranje mreže u toku...</span>
+  </div>
+
+
+  <div class="modal fade" id="errorModal" role="dialog">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            
+          </div>
+          <div class="modal-body">
+            <h4 class="modal-title">Greška!</h4>
+            <p>Došlo je do greške prilikom obrade podataka. Klasifikator verovatno ne 
+              može da obradi podatke iz unetog skupa ili je procenat podataka za trening mali. 
+              Pokušajte da povećate procenat podataka za trening.</p>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
